@@ -37,25 +37,24 @@ function wpdev_plugin_preinstaller_page() {
 
 // List all plugins with checkboxes
 function wpdev_list_plugins_to_install() {
-    $plugin_urls = array(
-        'https://wordpress.org/plugins/wordpress-seo/',
-        'https://wordpress.org/plugins/duplicate-page/',
-        'https://wordpress.org/plugins/wordpress-seo/',
-        'https://wordpress.org/plugins/classic-editor/',
-        'https://wordpress.org/plugins/worker/',
-        'https://wordpress.org/plugins/elementor/',
-        'https://wordpress.org/plugins/favicon-by-realfavicongenerator/',
-        'https://wordpress.org/plugins/google-site-kit/',
-        'https://wordpress.org/plugins/wp-mail-smtp/',
-        'https://wordpress.org/plugins/fluent-crm/'
-        // ... Add other plugin URLs here
-    );
+    $file_path = plugin_dir_path( __FILE__ ) . 'pluginlist.txt'; // Path to your pluginlist.txt file
 
-    foreach ($plugin_urls as $url) {
-        $slug = wpdev_extract_slug_from_url($url);
-        echo '<label><input type="checkbox" name="plugins[]" value="' . esc_attr($slug) . '"> ' . esc_html($slug) . '</label><br>';
+    // Check if the file exists
+    if (file_exists($file_path)) {
+        // Read the file and split into an array of lines
+        $plugin_urls = file($file_path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        foreach ($plugin_urls as $url) {
+            $slug = wpdev_extract_slug_from_url($url);
+            if ($slug) {
+                echo '<label><input type="checkbox" name="plugins[]" value="' . esc_attr($slug) . '"> ' . esc_html($slug) . '</label><br>';
+            }
+        }
+    } else {
+        echo '<p>Plugin list file not found.</p>';
     }
 }
+
 
 // Function to handle the form submission
 function wpdev_install_selected_plugins() {
@@ -125,4 +124,52 @@ function wpdev_install_plugin($slug) {
     $upgrader = new Plugin_Upgrader(new Automatic_Upgrader_Skin());
     $upgrader->install("https://wordpress.org/plugins/{$slug}/latest.zip");
 }
+
+
+function wpdev_install_github_plugin($github_zip_url) {
+    include_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+    include_once ABSPATH . 'wp-admin/includes/class-automatic-upgrader-skin.php';
+
+    $upgrader = new Plugin_Upgrader(new Automatic_Upgrader_Skin());
+    $result = $upgrader->install($github_zip_url);
+
+    if (is_wp_error($result)) {
+        // Handle errors
+        echo 'Error installing plugin from GitHub: ' . $result->get_error_message();
+    } else {
+        echo 'Plugin installed successfully.';
+    }
+}
+
+
+function wpdev_get_latest_github_release($repo) {
+    // GitHub API URL for the latest release
+    $url = "https://api.github.com/repos/{$repo}/releases/latest";
+
+    // Make the HTTP request
+    $response = wp_remote_get($url, array(
+        'headers' => array(
+            'User-Agent' => 'WordPress Fast Plugin Installer'
+        )
+    ));
+
+    // Check for errors
+    if (is_wp_error($response)) {
+        return false;
+    }
+
+    // Parse the response body
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
+
+    // Check for the 'zipball_url' in the response
+    if (isset($data['zipball_url'])) {
+        return $data['zipball_url'];
+    }
+
+    return false;
+}
+
+
+
 ?>

@@ -1,0 +1,9 @@
+https://wordpress.org/plugins/wordpress-seo/
+https://wordpress.org/plugins/duplicate-page/
+https://wordpress.org/plugins/classic-editor/
+https://wordpress.org/plugins/worker/
+https://wordpress.org/plugins/elementor/
+https://wordpress.org/plugins/favicon-by-realfavicongenerator/
+https://wordpress.org/plugins/google-site-kit/
+https://wordpress.org/plugins/wp-mail-smtp/
+https://wordpress.org/plugins/fluent-crm/
