@@ -74,13 +74,26 @@ function wpdev_install_selected_plugins() {
 
 // Extract slug from URL
 function wpdev_extract_slug_from_url($url) {
+    // Parse the URL and get the path part
     $parts = parse_url($url);
-    $path = $parts['path'];
-    $path_trimmed = trim($path, '/');
-    $path_parts = explode('/', $path_trimmed);
+    $path = isset($parts['path']) ? $parts['path'] : '';
 
-    return array_pop($path_parts);
+    // Normalize the path to ensure it has a consistent format
+    $path = trim($path, '/');
+
+    // Search for the plugins directory in the path
+    $pattern = '/wordpress\.org\/plugins\//';
+    $path_parts = preg_split($pattern, $path);
+
+    // If the split is successful, the last part should be the slug
+    if (is_array($path_parts) && count($path_parts) > 1) {
+        return end($path_parts);
+    }
+
+    // Return false if the slug could not be extracted
+    return false;
 }
+
 
 // Check if a plugin is installed
 function wpdev_is_plugin_installed($slug) {
