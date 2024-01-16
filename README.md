@@ -13,7 +13,6 @@ Start by forking this repository to your own GitHub account. This allows you to 
 In your forked repository, edit the `pluginslist.txt` file. This file should contain a list of plugin URLs you wish to install on your WordPress site. Add one URL per line. For example:
 
 https://wordpress.org/plugins/wordpress-seo/
-https://wordpress.org/plugins/classic-editor/
 
 You can also include direct links to plugin ZIP files from GitHub releases if you want to install plugins hosted on GitHub. Note the repo needs to be public. 
 
